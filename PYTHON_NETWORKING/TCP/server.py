@@ -33,7 +33,7 @@ def handle_client(conn, addr):
             for remote_client in clients:
                 if remote_client != conn:
                     remote_client.send(msg.encode(FORMAT))
-        except:
+        except:                                              #exception handle
             print(f"Client {addr} disconnected")
             clients.remove(conn)
             break
