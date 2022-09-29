@@ -4,6 +4,7 @@ from email import message
 from http import client, server
 import socket
 import threading
+from time import sleep
 
 PORT = 55555
 SERVER = socket.gethostbyname(socket.gethostname())
@@ -26,9 +27,11 @@ def handle_client(conn, addr):
                 print(f"Client {addr} disconnected")
                 clients.remove(conn)
                 break
-
-            print(f"[{addr}] {msg}")
-            print(len(msg))
+            if msg == "":
+                print(f"Client {addr} disconnected")
+                clients.remove(conn)
+                break
+        
     #        conn.send(msg.encode(FORMAT))
             for remote_client in clients:
                 if remote_client != conn:
