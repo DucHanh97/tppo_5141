@@ -31,20 +31,34 @@ def handle_send(client):
 
 def cmd_handle(cmd):
     buff_cmd = cmd.split()
-    print(buff_cmd[1])
-    print(len(buff_cmd))
     if buff_cmd[0] not in commands:
         print("Command is not supported")
     elif buff_cmd[0] == commands[0]:
-        if len(buff_cmd) < 3:
-            print("Don't enough arguments, arg = ",len(buff_cmd))
-        elif len(buff_cmd) > 3:
-            print("Too many arguments, arg = ", len(buff_cmd))
-        elif int(buff_cmd[1]) < 0 or int(buff_cmd[1]) > 100 or int(buff_cmd[2]) < 0 or int(buff_cmd[2]) > 100:
+        if len(buff_cmd) < 3 or len(buff_cmd) > 3:
+            print("Enter command according to the form: set <value> <value>")
+        elif buff_cmd[1] < '0' or buff_cmd[1] > '100' or buff_cmd[2] < '0' or buff_cmd[2] > '100':
             print("Enter a value between 0 and 100")
         else:
             print(cmd)
-    
+    elif buff_cmd[0] == commands[1]:
+        if len(buff_cmd) < 2 or len(buff_cmd) > 2:
+            print("Enter command according to the form: setcanvas <value>")
+        elif buff_cmd[1] < '0' or buff_cmd[1] > '100':
+            print("Enter a value between 0 and 100")
+        else:
+            print(cmd)
+    elif buff_cmd[0] == commands[2]:
+        if len(buff_cmd) < 2 or len(buff_cmd) > 2:
+            print("Enter command according to the form: setlight <value>")
+        elif buff_cmd[1] < '0' or buff_cmd[1] > '100':
+            print("Enter a value between 0 and 100")
+        else:
+            print(cmd)
+    else:
+        if len(buff_cmd) > 1:
+            print("Enter command according to the form: get")
+        else:
+            print(cmd)
 
 while True:
     cmd = input()
