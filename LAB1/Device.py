@@ -59,5 +59,3 @@ def setLightFlow(value):
 
 def setIllumination(canvas, light):
     return int((canvas * light) / 10000 * 50000)
-
-setLightFlow('95')

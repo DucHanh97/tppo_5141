@@ -30,13 +30,23 @@ def handle_send(client):
         cmd = input()
 
 def cmd_handle(cmd):
-    cmd = cmd.split()
-    if cmd[0] not in commands:
+    buff_cmd = cmd.split()
+    print(buff_cmd[1])
+    print(len(buff_cmd))
+    if buff_cmd[0] not in commands:
         print("Command is not supported")
+    elif buff_cmd[0] == commands[0]:
+        if len(buff_cmd) < 3:
+            print("Don't enough arguments, arg = ",len(buff_cmd))
+        elif len(buff_cmd) > 3:
+            print("Too many arguments, arg = ", len(buff_cmd))
+        elif int(buff_cmd[1]) < 0 or int(buff_cmd[1]) > 100 or int(buff_cmd[2]) < 0 or int(buff_cmd[2]) > 100:
+            print("Enter a value between 0 and 100")
+        else:
+            print(cmd)
     
 
 while True:
     cmd = input()
-    cmd = cmd.split()
-    print(len(cmd))
+    cmd_handle(cmd)
     
