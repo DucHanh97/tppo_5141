@@ -28,34 +28,24 @@ def getIllumination():
         if Illumination[i] == '=':
             return int(Illumination[i+1:])
 
-def setCanvas(value):
-    device = open('Device.txt','r')
-    device.readline()
-    buff = device.readline()
-    device.close()
-    for i in range(len(buff)):
-        if buff[i] == '=':
-            light = int(buff[i+1:])
-    illumin = str(setIllumination(int(value), light))
+def setParams(canvas, lightflow):
+    illumin = str(setIllumination(int(canvas), int(lightflow)))
     device = open('Device.txt','w')
-    device.write("canvas="+value+'\n')
-    device.write(buff)
-    device.write("illumination="+illumin)
-
-    
-
-def setLightFlow(value):
-    device = open('Device.txt','r')
-    buff = device.readline()
+    device.writelines("canvas="+canvas+"\nlightflow="+lightflow+"\nillumination="+illumin)
     device.close()
-    for i in range(len(buff)):
-        if buff[i] == '=':
-            canvas = int(buff[i+1:])
-    illumin = str(setIllumination(canvas, int(value)))
-    device = open('Device.txt','w')
-    device.write(buff)
-    device.write("lightflow="+value+'\n')
-    device.write("illumination="+illumin)
+
+# def setLightFlow(value):
+#     device = open('Device.txt','r')
+#     buff = device.readline()
+#     device.close()
+#     for i in range(len(buff)):
+#         if buff[i] == '=':
+#             canvas = int(buff[i+1:])
+#     illumin = str(setIllumination(canvas, int(value)))
+#     device = open('Device.txt','w')
+#     device.write(buff+"lightflow="+value+'\n'+"illumination="+illumin)
+    # device.write("lightflow="+value+'\n')
+    # device.write("illumination="+illumin)
 
 def setIllumination(canvas, light):
     return int((canvas * light) / 10000 * 50000)

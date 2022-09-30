@@ -8,26 +8,51 @@ SERVER_ADDR = (HOST, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSGAGE = "!DISCONNECT"
 
-#client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#client.connect(SERVER_ADDR)
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(SERVER_ADDR)
 
 print(">>>>>Successful connection to the TCP_Server<<<<<")
-print("List of supported commands")
-print("set <value> <value> - Set shift canvan and light flow")
-print("setcanvas <value> - Set shift canvas")
-print("setlight <value> - Set light flow")
-print("0 <= value <= 100")
-print("get - Read the values of all parameters of the blind")
+print("**[List of supported commands]**")
+print("> set <value> <value> - Set shift canvan and light flow")
+print("> setcanvas <value> - Set shift canvas")
+print("> setlight <value> - Set light flow")
+print("> 0 <= value <= 100")
+print("> get - Read the values of all parameters of the blind")
+print("> ", DISCONNECT_MESSGAGE, " - disconnect to the TCP_Server")
 print("------------------------------------------------------\n")
-
+print("Enter a command\n")
 commands = ("set", "setcanvas", "setlight", "get")
 
 connected = True
+
+def handle_recv(client):
+    global connected
+    while connected:
+        rx_data = client.recv(50).decode(FORMAT)
+        print(rx_data)
+    client.close()
 
 def handle_send(client):
     global connected
     while True:
         cmd = input()
+        if cmd == DISCONNECT_MESSGAGE:
+            send(DISCONNECT_MESSGAGE)
+            connected = False
+            break
+        else:
+            cmd_handle(cmd)
+
+def send(cmd):
+    command = cmd.encode(FORMAT)
+    command += b' ' * (20 - len(command))
+    client.send(command)
+
+def strtoint(str):
+    try:
+        return(int(str))    
+    except:
+        return -1
 
 def cmd_handle(cmd):
     buff_cmd = cmd.split()
@@ -36,31 +61,33 @@ def cmd_handle(cmd):
     elif buff_cmd[0] == commands[0]:
         if len(buff_cmd) < 3 or len(buff_cmd) > 3:
             print("Enter command according to the form: set <value> <value>")
-        elif buff_cmd[1] < '0' or buff_cmd[1] > '100' or buff_cmd[2] < '0' or buff_cmd[2] > '100':
-            print("Enter a value between 0 and 100")
+        elif strtoint(buff_cmd[1]) < 0 or strtoint(buff_cmd[1]) > 100 or strtoint(buff_cmd[2]) < 0 or strtoint(buff_cmd[2]) > 100:
+            print("Enter values between 0 and 100")
         else:
-            print(cmd)
+            send(cmd)
     elif buff_cmd[0] == commands[1]:
         if len(buff_cmd) < 2 or len(buff_cmd) > 2:
             print("Enter command according to the form: setcanvas <value>")
-        elif buff_cmd[1] < '0' or buff_cmd[1] > '100':
+        elif strtoint(buff_cmd[1]) < 0 or strtoint(buff_cmd[1]) > 100:
             print("Enter a value between 0 and 100")
         else:
-            print(cmd)
+            send(cmd)
     elif buff_cmd[0] == commands[2]:
         if len(buff_cmd) < 2 or len(buff_cmd) > 2:
             print("Enter command according to the form: setlight <value>")
-        elif buff_cmd[1] < '0' or buff_cmd[1] > '100':
+        elif strtoint(buff_cmd[1]) < 0 or strtoint(buff_cmd[1]) > 100:
             print("Enter a value between 0 and 100")
         else:
-            print(cmd)
+            send(cmd)
     else:
-        if len(buff_cmd) > 1:
-            print("Enter command according to the form: get")
-        else:
-            print(cmd)
+        send(buff_cmd[0])
 
-while True:
-    cmd = input()
-    cmd_handle(cmd)
-    
+
+thread1 = threading.Thread(target=handle_recv, args=(client, ))
+thread1.start()
+
+thread2 = threading.Thread(target=handle_send, args=(client, ))
+thread2.start()
+
+while connected:
+    sleep(2)
