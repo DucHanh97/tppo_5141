@@ -21,7 +21,7 @@ server.bind(SERVER_ADDR)
 
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
-    
+
     while True:
         try:
             xml_data = conn.recv(80).decode(FORMAT)
@@ -53,8 +53,10 @@ def handle_client(conn, addr):
     conn.close()
 
 def handle_send(Dv_Params):
+    notification = "Notification: Device parameters have changed"
     msg = "canvas="+str(Dv_Params["canvas"])+"; lightflow="+str(Dv_Params["lightflow"])+"; illumination="+str(Dv_Params["illumination"])
     for remote_client in clientlist:
+        remote_client.send(notification.encode(FORMAT))
         remote_client.send(msg.encode(FORMAT))
 
 def send_change_state():
