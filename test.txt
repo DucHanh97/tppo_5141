@@ -1,3 +1,0 @@
-canvas=100
-lightflow=100
-illumination=5000
