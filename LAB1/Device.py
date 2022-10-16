@@ -1,6 +1,5 @@
 from tkinter import Canvas
 
-
 def getCanvas():
     device = open('Device.txt', 'r')
     CanLine = device.readline()
@@ -33,19 +32,6 @@ def setParams(canvas, lightflow):
     device = open('Device.txt','w')
     device.writelines("canvas="+canvas+"\nlightflow="+lightflow+"\nillumination="+illumin)
     device.close()
-
-# def setLightFlow(value):
-#     device = open('Device.txt','r')
-#     buff = device.readline()
-#     device.close()
-#     for i in range(len(buff)):
-#         if buff[i] == '=':
-#             canvas = int(buff[i+1:])
-#     illumin = str(setIllumination(canvas, int(value)))
-#     device = open('Device.txt','w')
-#     device.write(buff+"lightflow="+value+'\n'+"illumination="+illumin)
-    # device.write("lightflow="+value+'\n')
-    # device.write("illumination="+illumin)
 
 def setIllumination(canvas, light):
     return int((canvas * light) / 10000 * 50000)

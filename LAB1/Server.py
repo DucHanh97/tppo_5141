@@ -1,7 +1,8 @@
 import socket
 import threading
-from time import sleep
 import Device as device
+import xml.etree.ElementTree as ET
+import os
 
 HOST   = "127.0.0.1"
 PORT = 55555
@@ -23,27 +24,23 @@ def handle_client(conn, addr):
     
     while True:
         try:
-            cmd = conn.recv(20).decode(FORMAT)
-            if cmd[0:11] == DISCONNECT_MESSGAGE:
+            xml_data = conn.recv(80).decode(FORMAT)
+            print(xml_data)
+            root = ET.fromstring(xml_data)
+            if root[0].text == DISCONNECT_MESSGAGE:
                 print(f"Client {addr} disconnected")
                 clientlist.remove(conn)
                 break
-            if cmd == '':
-                print(f"Client {addr} disconnected")
-                clientlist.remove(conn)
-                break
-                
-            print(cmd)
-            buff = cmd.split()
-            if buff[0] == "set":
-                if int(buff[1]) != Dv_Params["canvas"] or int(buff[2]) != Dv_Params["lightflow"]:
-                    device.setParams(buff[1],buff[2])
-            elif buff[0] == "setcanvas":
-                if int(buff[1]) != Dv_Params["canvas"]:
-                    device.setParams(buff[1], str(Dv_Params["lightflow"]))
-            elif buff[0] == "setlight":
-                if int(buff[1]) != Dv_Params["lightflow"]:
-                    device.setParams(str(Dv_Params["canvas"]), buff[1])
+
+            if root[0].text == "set":
+                if int(root[1].text) != Dv_Params["canvas"] or int(root[2].text) != Dv_Params["lightflow"]:
+                    device.setParams(root[1].text,root[2].text)
+            elif root[0].text == "setcanvas":
+                if int(root[1].text) != Dv_Params["canvas"]:
+                    device.setParams(root[1].text, str(Dv_Params["lightflow"]))
+            elif root[0].text == "setlight":
+                if int(root[2].text) != Dv_Params["lightflow"]:
+                    device.setParams(str(Dv_Params["canvas"]), root[2].text)
             else:
                 msg = "canvas="+str(Dv_Params["canvas"])+"; lightflow="+str(Dv_Params["lightflow"])+"; illumination="+str(Dv_Params["illumination"])
                 conn.send(msg.encode(FORMAT))
@@ -60,30 +57,24 @@ def handle_send(Dv_Params):
     for remote_client in clientlist:
         remote_client.send(msg.encode(FORMAT))
 
-# def handle_cmd(cmd):
-#     buff = cmd.split()
-#     if buff[0] == "set":
-#         if int(buff[1]) != Dv_Params["canvas"] or int(buff[2]) != Dv_Params["lightflow"]:
-#             device.setParams(buff[1],buff[2])
-#     elif buff[0] == "setcanvas":
-#         if int(buff[1]) != Dv_Params["canvas"]:
-#             device.setParams(buff[1], str(Dv_Params["lightflow"]))
-#     elif buff[0] == "setlight":
-#         if int(buff[1]) != Dv_Params["lightflow"]:
-#             device.setParams(str(Dv_Params["canvas"]), buff[1])
-
 def send_change_state():
     global Dv_Params
+    time_cache = os.stat("Device.txt").st_mtime
     while True:
-        sleep(1)
-        cur_Canvas  = device.getCanvas()
-        cur_Light   = device.getLightFlow()
-        if (cur_Canvas != Dv_Params["canvas"]) or (cur_Light != Dv_Params["lightflow"]):
-            device.setParams(str(cur_Canvas), str(cur_Light))
-            Dv_Params["canvas"] = device.getCanvas()
-            Dv_Params["lightflow"] = device.getLightFlow()
-            Dv_Params["illumination"] = device.getIllumination()
-            handle_send(Dv_Params)
+        time_change = os.stat("Device.txt").st_mtime
+        if time_change != time_cache:
+            time_cache = time_change
+            print("File has changed")
+            cur_Canvas  = device.getCanvas()
+            cur_Light   = device.getLightFlow()
+
+            if cur_Canvas != Dv_Params["canvas"] or cur_Light != Dv_Params["lightflow"]:
+                device.setParams(str(cur_Canvas), str(cur_Light))
+                Dv_Params["canvas"] = device.getCanvas()
+                Dv_Params["lightflow"] = device.getLightFlow()
+                Dv_Params["illumination"] = device.getIllumination()
+                handle_send(Dv_Params)
+                print("Sent data to clients")
 
 def start():
     server.listen()
@@ -91,14 +82,17 @@ def start():
     while True:
         conn, addr = server.accept()
         clientlist.append(conn)
-        print(f"[ACTIVE CONNECTIONS] {threading.active_count()}")
-        thread1 = threading.Thread(target=handle_client, args=(conn, addr))
-        thread1.start()
-        thread2 = threading.Thread(target=send_change_state, args=())
-        thread2.start()
-
+        print(f"[ACTIVE CONNECTIONS] = {threading.active_count()//2+1}")
+        for cl in clientlist:
+            print(cl)
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
 
 print("Server is starting...")
+
+thread = threading.Thread(target=send_change_state, args=())
+thread.start()
+
 start()
 
 

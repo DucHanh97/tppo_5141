@@ -21,7 +21,7 @@ print("> get - Read the values of all parameters of the blind")
 print("> ", DISCONNECT_MESSGAGE, " - disconnect to the TCP_Server")
 print("------------------------------------------------------\n")
 print("Enter a command\n")
-commands = ("set", "setcanvas", "setlight", "get")
+commands = ("set", "setcanvas", "setlight", "get", DISCONNECT_MESSGAGE)
 
 connected = True
 
@@ -45,7 +45,6 @@ def handle_send(client):
 
 def send(cmd):
     command = cmd.encode(FORMAT)
-    command += b' ' * (20 - len(command))
     client.send(command)
 
 def strtoint(str):
@@ -54,7 +53,12 @@ def strtoint(str):
     except:
         return -1
 
+def xml_cmd_toSend(cmd,arg1, arg2):
+    xml_data = f"<command><cmd>{cmd}</cmd><arg1>{arg1}</arg1><arg2>{arg2}</arg2></command>"
+    return xml_data
+
 def cmd_handle(cmd):
+    xml_data = ""
     buff_cmd = cmd.split()
     if buff_cmd[0] not in commands:
         print("Command is not supported")
@@ -64,23 +68,24 @@ def cmd_handle(cmd):
         elif strtoint(buff_cmd[1]) < 0 or strtoint(buff_cmd[1]) > 100 or strtoint(buff_cmd[2]) < 0 or strtoint(buff_cmd[2]) > 100:
             print("Enter values between 0 and 100")
         else:
-            send(cmd)
+            xml_data = xml_cmd_toSend(buff_cmd[0], buff_cmd[1], buff_cmd[2])
     elif buff_cmd[0] == commands[1]:
         if len(buff_cmd) < 2 or len(buff_cmd) > 2:
             print("Enter command according to the form: setcanvas <value>")
         elif strtoint(buff_cmd[1]) < 0 or strtoint(buff_cmd[1]) > 100:
             print("Enter a value between 0 and 100")
         else:
-            send(cmd)
+            xml_data = xml_cmd_toSend(buff_cmd[0], buff_cmd[1], "NULL")
     elif buff_cmd[0] == commands[2]:
         if len(buff_cmd) < 2 or len(buff_cmd) > 2:
             print("Enter command according to the form: setlight <value>")
         elif strtoint(buff_cmd[1]) < 0 or strtoint(buff_cmd[1]) > 100:
             print("Enter a value between 0 and 100")
         else:
-            send(cmd)
+            xml_data = xml_cmd_toSend(buff_cmd[0], "NULL", buff_cmd[1])
     else:
-        send(buff_cmd[0])
+        xml_data = xml_cmd_toSend(buff_cmd[0], "NULL", "NULL")
+    send(xml_data)
 
 
 thread1 = threading.Thread(target=handle_recv, args=(client, ))
