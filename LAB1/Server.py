@@ -63,23 +63,20 @@ def send_change_state():
     global Dv_Params
     time_cache = os.stat("Device.txt").st_mtime
     while True:
-        try:
-            time_change = os.stat("Device.txt").st_mtime
-            if time_change != time_cache:
-                time_cache = time_change
+        time_change = os.stat("Device.txt").st_mtime
+        if time_change != time_cache:
+            time_cache = time_change
 
-                cur_Canvas  = device.getCanvas()
-                cur_Light   = device.getLightFlow()
+            cur_Canvas  = device.getCanvas()
+            cur_Light   = device.getLightFlow()
 
-                if cur_Canvas != Dv_Params["canvas"] or cur_Light != Dv_Params["lightflow"]:
-                    device.setParams(str(cur_Canvas), str(cur_Light))
-                    Dv_Params["canvas"] = device.getCanvas()
-                    Dv_Params["lightflow"] = device.getLightFlow()
-                    Dv_Params["illumination"] = device.getIllumination()
-                    handle_send(Dv_Params)
-                    print("Sent data to clients")
-        except:
-            print("Cannot connect to device")
+            if cur_Canvas != Dv_Params["canvas"] or cur_Light != Dv_Params["lightflow"]:
+                device.setParams(str(cur_Canvas), str(cur_Light))
+                Dv_Params["canvas"] = device.getCanvas()
+                Dv_Params["lightflow"] = device.getLightFlow()
+                Dv_Params["illumination"] = device.getIllumination()
+                handle_send(Dv_Params)
+                print("Sent data to clients")
 
 def start():
     server.listen()
