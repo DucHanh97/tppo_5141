@@ -61,20 +61,23 @@ def send_change_state():
     global Dv_Params
     time_cache = os.stat("Device.txt").st_mtime
     while True:
-        time_change = os.stat("Device.txt").st_mtime
-        if time_change != time_cache:
-            time_cache = time_change
-            print("File has changed")
-            cur_Canvas  = device.getCanvas()
-            cur_Light   = device.getLightFlow()
+        try:
+            time_change = os.stat("Device.txt").st_mtime
+            if time_change != time_cache:
+                time_cache = time_change
 
-            if cur_Canvas != Dv_Params["canvas"] or cur_Light != Dv_Params["lightflow"]:
-                device.setParams(str(cur_Canvas), str(cur_Light))
-                Dv_Params["canvas"] = device.getCanvas()
-                Dv_Params["lightflow"] = device.getLightFlow()
-                Dv_Params["illumination"] = device.getIllumination()
-                handle_send(Dv_Params)
-                print("Sent data to clients")
+                cur_Canvas  = device.getCanvas()
+                cur_Light   = device.getLightFlow()
+
+                if cur_Canvas != Dv_Params["canvas"] or cur_Light != Dv_Params["lightflow"]:
+                    device.setParams(str(cur_Canvas), str(cur_Light))
+                    Dv_Params["canvas"] = device.getCanvas()
+                    Dv_Params["lightflow"] = device.getLightFlow()
+                    Dv_Params["illumination"] = device.getIllumination()
+                    handle_send(Dv_Params)
+                    print("Sent data to clients")
+        except:
+            print("Cannot connect to device")
 
 def start():
     server.listen()
@@ -82,9 +85,8 @@ def start():
     while True:
         conn, addr = server.accept()
         clientlist.append(conn)
-        print(f"[ACTIVE CONNECTIONS] = {threading.active_count()//2+1}")
-        for cl in clientlist:
-            print(cl)
+        print(f"[ACTIVE CONNECTIONS] = {threading.active_count()-1}")
+
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
 
