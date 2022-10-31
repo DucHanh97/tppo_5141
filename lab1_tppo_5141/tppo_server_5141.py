@@ -4,8 +4,8 @@ import Device as device
 import xml.etree.ElementTree as ET
 import os
 
-HOST   = "127.0.0.1"
-PORT = 55555
+HOST   = input("Enter server IP-Address: ")
+PORT = int(input("Enter server PORT: "))
 SERVER_ADDR = (HOST, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSGAGE = "!DISCONNECT"
@@ -80,7 +80,7 @@ def send_change_state():
 
 def start():
     server.listen()
-    print(f"[LISTENING] Server is listenning on {HOST}")
+    print(f"[LISTENING] Server is listenning on {SERVER_ADDR}")
     while True:
         conn, addr = server.accept()
         clientlist.append(conn)

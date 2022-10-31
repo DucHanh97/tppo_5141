@@ -2,8 +2,8 @@ import socket
 import threading
 from time import sleep
 
-HOST   = "127.0.0.1"
-PORT = 55555
+HOST   = input("Enter server IP-Address: ")
+PORT = int(input("Enter server PORT: "))
 SERVER_ADDR = (HOST, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSGAGE = "!DISCONNECT"
