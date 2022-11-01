@@ -3,9 +3,10 @@ import threading
 import Device as device
 import xml.etree.ElementTree as ET
 import os
+from sys import argv
 
-HOST   = input("Enter server IP-Address: ")
-PORT = int(input("Enter server PORT: "))
+HOST   = argv[1]
+PORT = int(argv[2])
 SERVER_ADDR = (HOST, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSGAGE = "!DISCONNECT"
