@@ -1,5 +1,3 @@
-from tkinter import Canvas
-
 def getCanvas():
     device = open('Device.txt', 'r')
     CanLine = device.readline()
@@ -35,3 +33,6 @@ def setParams(canvas, lightflow):
 
 def setIllumination(canvas, light):
     return int((canvas * light) / 10000 * 50000)
+
+if(__name__=="__main__"):
+    setParams(str(100),str(100))
