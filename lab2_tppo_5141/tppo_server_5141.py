@@ -90,7 +90,7 @@ def notifDeviceChange_handle():
                 Dv_Params[1]["lightflow"] = str(device.getLightFlow())
                 Dv_Params[2]["illumination"] = str(device.getIllumination())
                 print(Dv_Params)
-                socketio.emit("Notification: Device parameters have changed: {Dv_Params}", broadcast=True)
+                socketio.emit("DeviceChanged", Dv_Params, broadcast=True)
                 print("Sent data to clients")
 
 notifDeviceChange = threading.Thread(target=notifDeviceChange_handle, args=())

@@ -55,7 +55,7 @@ def connect():
                 print("Enter values between 0 and 100")
             else:
                 response = set_both_parameters("canvas",buff_cmd[1],"light", buff_cmd[2])
-                print(f"[Response from server]: ", response.json())
+                print(f"[Parameters have set]: ", response.json()[0], response.json()[1])
         elif buff_cmd[0] == commands[1]:
             if len(buff_cmd) < 2 or len(buff_cmd) > 2:
                 print("Enter command according to the form: setcanvas <value>")
@@ -63,7 +63,7 @@ def connect():
                 print("Enter a value between 0 and 100")
             else:
                 response = set_parameter("canvas", buff_cmd[1])
-                print(f"[Response from server]: ", response.json())
+                print(f"[Parameter has set]: ", response.json()[0])
         elif buff_cmd[0] == commands[2]:
             if len(buff_cmd) < 2 or len(buff_cmd) > 2:
                 print("Enter command according to the form: setlight <value>")
@@ -71,10 +71,10 @@ def connect():
                 print("Enter a value between 0 and 100")
             else:
                 response = set_parameter("light", buff_cmd[1])
-                print(f"[Response from server]: ", response.json())
+                print(f"[Parameter has set]: ", response.json()[1])
         else:
             response = get_parameter()
-            print(f"[Response from server]: ", response.json())
+            print(f"[Device parameters]: ", response.json())
 
 @client_io.on("DeviceChanged")
 def DeviceChanged_Handler(Notice):
