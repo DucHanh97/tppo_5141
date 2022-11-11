@@ -40,7 +40,6 @@ def connect():
     print("> setlight <value> - Set light flow")
     print("> 0 <= value <= 100")
     print("> get - Read the values of all parameters of the blind")
-    print("> !DISCONNECT - disconnect to the TCP_Server")
     print("------------------------------------------------------\n")
     print("Enter a command\n")
     while True:
